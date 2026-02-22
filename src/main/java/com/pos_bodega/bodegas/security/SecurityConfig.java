@@ -20,25 +20,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
   private final JwtFilter jwtFilter;
+  private final CorsConfig corsConfig;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
+        // ✅ Habilitar CORS con nuestra configuración
+        .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            // Login público
             .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/api/usuarios/**").permitAll()
-            .requestMatchers("/api/empresas/**").permitAll()
-            .requestMatchers("/api/productos/**").permitAll()
-            // ✅ Swagger público
             .requestMatchers(
                 "/swagger-ui/**",
                 "/swagger-ui.html",
                 "/v3/api-docs/**"
             ).permitAll()
-            // Todo lo demás requiere token
             .anyRequest().authenticated()
         )
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
