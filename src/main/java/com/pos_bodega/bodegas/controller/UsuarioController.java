@@ -91,13 +91,15 @@ public class UsuarioController {
       summary = "Cambiar estado",
       description = "Activa o desactiva un usuario. Usar ?activo=true o ?activo=false"
   )
-  @PatchMapping("/{id}/{idempresa}/estado")
+  @PatchMapping("/{id}")
   public ResponseEntity<Void> cambiarEstado(
       @PathVariable Long id,
-      @PathVariable Long idempresa,
+      HttpServletRequest request,
       @RequestParam Boolean activo
       ) {
-    usuarioService.cambiarEstado(id, activo, idempresa);
+
+    Long empresaId = getEmpresaId(request);
+    usuarioService.cambiarEstado(id, activo, empresaId);
     return ResponseEntity.noContent().build();
   }
 

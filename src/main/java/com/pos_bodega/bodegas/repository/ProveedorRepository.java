@@ -1,5 +1,6 @@
-package com.pos_bodega.bodegas.repository.entity;
+package com.pos_bodega.bodegas.repository;
 
+import com.pos_bodega.bodegas.repository.entity.Proveedor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,8 +10,9 @@ import java.util.Optional;
 @Repository
 public interface ProveedorRepository extends JpaRepository<Proveedor, Long> {
 
-  // ⚠️ MULTI-TENANT
   List<Proveedor> findByEmpresaId(Long empresaId);
+
+  List<Proveedor> findByEmpresaIdOrderByNombreAsc(Long empresaId);
 
   List<Proveedor> findByEmpresaIdAndActivoTrue(Long empresaId);
 
