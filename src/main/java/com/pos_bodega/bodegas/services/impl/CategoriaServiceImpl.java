@@ -21,7 +21,7 @@ public class CategoriaServiceImpl implements CategoriaService {
   // CREAR
   // -----------------------------------------------
   @Override
-  public CategoriaResponse crear(CategoriaRequest request ) {
+  public CategoriaResponse crear(CategoriaRequest request, Long empresaId ) {
 
     // Validar nombre único dentro de la empresa
     if (categoriaRepository.existsByNombreAndEmpresaId(request.getNombre(), request.getEmpresaId())) {
@@ -29,7 +29,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     Categoria categoria = new Categoria();
-    categoria.setEmpresaId(request.getEmpresaId());
+    categoria.setEmpresaId(empresaId);
     categoria.setNombre(request.getNombre().trim());
     categoria.setDescripcion(request.getDescripcion());
     categoria.setActivo(true);

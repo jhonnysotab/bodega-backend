@@ -32,9 +32,9 @@ public class CategoriaController {
   @Operation(summary = "Crear categoría", description = "Crea una nueva categoría para la empresa")
   @PostMapping
   public ResponseEntity<CategoriaResponse> crear(
-      @RequestBody CategoriaRequest request) {
-
-    return ResponseEntity.status(201).body(categoriaService.crear(request));
+      @RequestBody CategoriaRequest request,HttpServletRequest request2) {
+    Long empresaId = getEmpresaId(request2);
+    return ResponseEntity.status(201).body(categoriaService.crear(request,empresaId));
   }
 
   // -----------------------------------------------

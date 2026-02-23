@@ -2,6 +2,8 @@ package com.pos_bodega.bodegas.services;
 
 import com.pos_bodega.bodegas.controller.dto.AuthResponse;
 import com.pos_bodega.bodegas.controller.dto.LoginRequest;
+import com.pos_bodega.bodegas.repository.entity.Empresa;
+import com.pos_bodega.bodegas.repository.entity.EmpresaRepository;
 import com.pos_bodega.bodegas.repository.entity.Usuario;
 import com.pos_bodega.bodegas.repository.entity.UsuarioRepository;
 import com.pos_bodega.bodegas.security.JwtUtil;
@@ -9,11 +11,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
   private final UsuarioRepository usuarioRepository;
+  private final EmpresaRepository empresaRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
 
@@ -38,7 +43,9 @@ public class AuthService {
         usuario.getUsername(),
         usuario.getEmpresaId(),
         usuario.getRol().name()
+
     );
+    Optional<Empresa> empresa = empresaRepository.findById(usuario.getEmpresaId());
 
     // 5. Retornar respuesta con token y datos básicos
     return new AuthResponse(
@@ -46,7 +53,8 @@ public class AuthService {
         usuario.getUsername(),
         usuario.getNombre(),
         usuario.getRol().name(),
-        usuario.getEmpresaId()
+        usuario.getEmpresaId(),
+        empresa.get().getNombre()
     );
   }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CategoriaService {
 
-  CategoriaResponse crear(CategoriaRequest request );
+  CategoriaResponse crear(CategoriaRequest request,Long empresaId );
 
   List<CategoriaResponse> listar(Long empresaId);
 

@@ -31,6 +31,8 @@ public class Usuario {
   @Column(name = "fecha_creacion")
   private LocalDateTime fechaCreacion = LocalDateTime.now();
 
+
+
   public enum Rol {
     ADMIN, CAJERO
   }
