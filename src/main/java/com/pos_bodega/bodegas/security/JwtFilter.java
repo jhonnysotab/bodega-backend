@@ -44,10 +44,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
     String username = jwtUtil.extractUsername(token);
     Long empresaId  = jwtUtil.extractEmpresaId(token);
+    Long usuarioId  = jwtUtil.extractUsuarioId(token);
     String rol      = jwtUtil.extractRol(token);
 
-    // Guardamos empresaId en el request para usarlo en los controllers/services
+    // Guardamos empresaId/usuarioId en el request para usarlos en los controllers/services
     request.setAttribute("empresaId", empresaId);
+    request.setAttribute("usuarioId", usuarioId);
 
     // Autenticamos en el contexto de Spring Security
     var auth = new UsernamePasswordAuthenticationToken(

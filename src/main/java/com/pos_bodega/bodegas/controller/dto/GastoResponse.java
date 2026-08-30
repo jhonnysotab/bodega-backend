@@ -12,4 +12,9 @@ public class GastoResponse {
   private LocalDate fecha;
   private Long usuarioId;
   private String usuarioNombre;
+  private Long categoriaId;
+  private String categoriaNombre;
+  private Long proveedorId;
+  private String proveedorNombre;
+  private String nota;
 }

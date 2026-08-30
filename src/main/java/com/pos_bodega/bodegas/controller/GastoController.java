@@ -2,8 +2,7 @@ package com.pos_bodega.bodegas.controller;
 
 import com.pos_bodega.bodegas.controller.dto.GastoRequest;
 import com.pos_bodega.bodegas.controller.dto.GastoResponse;
-import com.pos_bodega.bodegas.repository.entity.UsuarioRepository;
-import com.pos_bodega.bodegas.services.impl.GastoServiceImpl;
+import com.pos_bodega.bodegas.services.GastoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,18 +20,14 @@ import java.util.List;
 @Tag(name = "Gastos", description = "Registro de gastos del negocio")
 public class GastoController {
 
-  private final GastoServiceImpl gastoService;
-  private final UsuarioRepository usuarioRepository;
+  private final GastoService gastoService;
 
   private Long getEmpresaId(HttpServletRequest request) {
     return (Long) request.getAttribute("empresaId");
   }
 
   private Long getUsuarioId(HttpServletRequest request) {
-    String username = request.getUserPrincipal().getName();
-    return usuarioRepository.findByUsername(username)
-        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"))
-        .getId();
+    return (Long) request.getAttribute("usuarioId");
   }
 
   @Operation(summary = "Registrar gasto", description = "Registra un nuevo gasto del negocio")
@@ -44,6 +39,16 @@ public class GastoController {
     Long empresaId = getEmpresaId(request);
     Long usuarioId = getUsuarioId(request);
     return ResponseEntity.status(201).body(gastoService.crear(gastoRequest, empresaId, usuarioId));
+  }
+
+  @Operation(summary = "Actualizar gasto", description = "Actualiza un gasto existente")
+  @PutMapping("/{id}")
+  public ResponseEntity<GastoResponse> actualizar(
+      @PathVariable Long id,
+      @RequestBody GastoRequest gastoRequest,
+      HttpServletRequest request) {
+
+    return ResponseEntity.ok(gastoService.actualizar(id, gastoRequest, getEmpresaId(request)));
   }
 
   @Operation(summary = "Listar gastos", description = "Lista todos los gastos de la empresa")

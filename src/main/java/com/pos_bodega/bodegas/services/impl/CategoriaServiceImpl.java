@@ -1,9 +1,11 @@
 package com.pos_bodega.bodegas.services.impl;
 
+import com.pos_bodega.bodegas.exception.ResourceNotFoundException;
+
 import com.pos_bodega.bodegas.controller.dto.CategoriaRequest;
 import com.pos_bodega.bodegas.controller.dto.CategoriaResponse;
 import com.pos_bodega.bodegas.repository.entity.Categoria;
-import com.pos_bodega.bodegas.repository.entity.CategoriaRepository;
+import com.pos_bodega.bodegas.repository.CategoriaRepository;
 import com.pos_bodega.bodegas.services.CategoriaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -102,7 +104,7 @@ public class CategoriaServiceImpl implements CategoriaService {
   // -----------------------------------------------
   private Categoria findByIdAndEmpresa(Long id, Long empresaId) {
     return categoriaRepository.findByIdAndEmpresaId(id, empresaId)
-        .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada con id: " + id));
   }
 
   private CategoriaResponse toResponse(Categoria c) {

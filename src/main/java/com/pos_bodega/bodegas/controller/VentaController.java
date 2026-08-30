@@ -2,8 +2,7 @@ package com.pos_bodega.bodegas.controller;
 
 import com.pos_bodega.bodegas.controller.dto.VentaRequest;
 import com.pos_bodega.bodegas.controller.dto.VentaResponse;
-import com.pos_bodega.bodegas.repository.entity.UsuarioRepository;
-import com.pos_bodega.bodegas.services.impl.VentaServiceImpl;
+import com.pos_bodega.bodegas.services.VentaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,18 +20,14 @@ import java.util.List;
 @Tag(name = "Ventas", description = "Registro y consulta de ventas")
 public class VentaController {
 
-  private final VentaServiceImpl ventaService;
-  private final UsuarioRepository usuarioRepository;
+  private final VentaService ventaService;
 
   private Long getEmpresaId(HttpServletRequest request) {
     return (Long) request.getAttribute("empresaId");
   }
 
   private Long getUsuarioId(HttpServletRequest request) {
-    String username = request.getUserPrincipal().getName();
-    return usuarioRepository.findByUsername(username)
-        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"))
-        .getId();
+    return (Long) request.getAttribute("usuarioId");
   }
 
   @Operation(summary = "Registrar venta", description = "Crea una venta, descuenta stock automáticamente y genera número de venta")

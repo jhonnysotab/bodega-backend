@@ -23,9 +23,10 @@ public class JwtUtil {
     return Keys.hmacShaKeyFor(secret.getBytes());
   }
 
-  public String generateToken(String username, Long empresaId, String rol) {
+  public String generateToken(String username, Long empresaId, Long usuarioId, String rol) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("empresaId", empresaId);
+    claims.put("usuarioId", usuarioId);
     claims.put("rol", rol);
 
     return Jwts.builder()
@@ -43,6 +44,10 @@ public class JwtUtil {
 
   public Long extractEmpresaId(String token) {
     return getClaims(token).get("empresaId", Long.class);
+  }
+
+  public Long extractUsuarioId(String token) {
+    return getClaims(token).get("usuarioId", Long.class);
   }
 
   public String extractRol(String token) {

@@ -1,12 +1,17 @@
 package com.pos_bodega.bodegas.services.impl;
 
+import com.pos_bodega.bodegas.exception.BusinessException;
+import com.pos_bodega.bodegas.exception.ResourceNotFoundException;
+
 import com.pos_bodega.bodegas.controller.dto.*;
+import com.pos_bodega.bodegas.repository.CajaRepository;
 import com.pos_bodega.bodegas.repository.MovimientoStockRepository;
 import com.pos_bodega.bodegas.repository.VentaDetalleRepository;
 import com.pos_bodega.bodegas.repository.VentaRepository;
 import com.pos_bodega.bodegas.repository.entity.*;
-import com.pos_bodega.bodegas.repository.entity.ProductoRepository;
-import com.pos_bodega.bodegas.repository.entity.UsuarioRepository;
+import com.pos_bodega.bodegas.repository.ProductoRepository;
+import com.pos_bodega.bodegas.repository.UsuarioRepository;
+import com.pos_bodega.bodegas.services.VentaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,17 +25,19 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class VentaServiceImpl {
+public class VentaServiceImpl implements VentaService {
 
   private final VentaRepository ventaRepository;
   private final VentaDetalleRepository ventaDetalleRepository;
   private final ProductoRepository productoRepository;
   private final MovimientoStockRepository movimientoStockRepository;
   private final UsuarioRepository usuarioRepository;
+  private final CajaRepository cajaRepository;
 
   // -----------------------------------------------
   // CREAR VENTA - lógica crítica
   // -----------------------------------------------
+  @Override
   @Transactional
   public VentaResponse crear(VentaRequest request, Long empresaId, Long usuarioId) {
 
@@ -38,6 +45,10 @@ public class VentaServiceImpl {
     if (request.getDetalles() == null || request.getDetalles().isEmpty()) {
       throw new RuntimeException("La venta debe tener al menos un producto");
     }
+
+    // 1.1 Debe haber una caja abierta para poder vender
+    Caja caja = cajaRepository.findByEmpresaIdAndEstado(empresaId, Caja.Estado.ABIERTA)
+        .orElseThrow(() -> new BusinessException("Debes abrir la caja antes de registrar una venta"));
 
     // 2. Validar tipo de pago
     Venta.TipoPago tipoPago;
@@ -52,9 +63,9 @@ public class VentaServiceImpl {
     for (VentaDetalleRequest detalle : request.getDetalles()) {
       Producto producto = productoRepository
           .findByIdAndEmpresaId(detalle.getProductoId(), empresaId)
-          .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + detalle.getProductoId()));
+          .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado: " + detalle.getProductoId()));
 
-      if (!producto.getActivo()) {
+      if (!producto.getActivo() ) {
         throw new RuntimeException("El producto '" + producto.getNombre() + "' no está activo");
       }
 
@@ -86,6 +97,7 @@ public class VentaServiceImpl {
     // 6. Guardar venta
     Venta venta = new Venta();
     venta.setEmpresaId(empresaId);
+    venta.setCajaId(caja.getId());
     venta.setNumeroVenta(generarNumeroVenta(empresaId));
     venta.setTotal(total);
     venta.setTipoPago(tipoPago);
@@ -135,6 +147,7 @@ public class VentaServiceImpl {
   // -----------------------------------------------
   // LISTAR
   // -----------------------------------------------
+  @Override
   public List<VentaResponse> listar(Long empresaId) {
     return ventaRepository.findByEmpresaIdOrderByFechaVentaDesc(empresaId)
         .stream().map(v -> toResponse(v, v.getDetalles())).collect(Collectors.toList());
@@ -143,6 +156,7 @@ public class VentaServiceImpl {
   // -----------------------------------------------
   // LISTAR POR FECHA
   // -----------------------------------------------
+  @Override
   public List<VentaResponse> listarPorFecha(Long empresaId, LocalDateTime desde, LocalDateTime hasta) {
     return ventaRepository.findByEmpresaIdAndFechaVentaBetween(empresaId, desde, hasta)
         .stream().map(v -> toResponse(v, v.getDetalles())).collect(Collectors.toList());
@@ -151,9 +165,10 @@ public class VentaServiceImpl {
   // -----------------------------------------------
   // OBTENER POR ID
   // -----------------------------------------------
+  @Override
   public VentaResponse obtener(Long id, Long empresaId) {
     Venta venta = ventaRepository.findByIdAndEmpresaId(id, empresaId)
-        .orElseThrow(() -> new RuntimeException("Venta no encontrada con id: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada con id: " + id));
     return toResponse(venta, venta.getDetalles());
   }
 
@@ -174,6 +189,7 @@ public class VentaServiceImpl {
   private VentaResponse toResponse(Venta v, List<VentaDetalle> detalles) {
     VentaResponse res = new VentaResponse();
     res.setId(v.getId());
+    res.setCajaId(v.getCajaId());
     res.setNumeroVenta(v.getNumeroVenta());
     res.setTotal(v.getTotal());
     res.setTipoPago(v.getTipoPago().name());

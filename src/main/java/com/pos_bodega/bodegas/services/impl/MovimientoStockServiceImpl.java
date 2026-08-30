@@ -1,12 +1,15 @@
 package com.pos_bodega.bodegas.services.impl;
 
+import com.pos_bodega.bodegas.exception.ResourceNotFoundException;
+
 import com.pos_bodega.bodegas.controller.dto.MovimientoStockRequest;
 import com.pos_bodega.bodegas.controller.dto.MovimientoStockResponse;
 import com.pos_bodega.bodegas.repository.MovimientoStockRepository;
 import com.pos_bodega.bodegas.repository.ProveedorRepository;
 import com.pos_bodega.bodegas.repository.entity.*;
-import com.pos_bodega.bodegas.repository.entity.ProductoRepository;
-import com.pos_bodega.bodegas.repository.entity.UsuarioRepository;
+import com.pos_bodega.bodegas.repository.ProductoRepository;
+import com.pos_bodega.bodegas.repository.UsuarioRepository;
+import com.pos_bodega.bodegas.services.MovimientoStockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MovimientoStockServiceImpl {
+public class MovimientoStockServiceImpl implements MovimientoStockService {
 
   private final MovimientoStockRepository movimientoStockRepository;
   private final ProductoRepository productoRepository;
@@ -26,6 +29,7 @@ public class MovimientoStockServiceImpl {
   // -----------------------------------------------
   // REGISTRAR INGRESO O AJUSTE
   // -----------------------------------------------
+  @Override
   @Transactional
   public MovimientoStockResponse registrar(MovimientoStockRequest request, Long empresaId, Long usuarioId) {
 
@@ -43,7 +47,7 @@ public class MovimientoStockServiceImpl {
 
     // Validar producto
     Producto producto = productoRepository.findByIdAndEmpresaId(request.getProductoId(), empresaId)
-        .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + request.getProductoId()));
+        .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + request.getProductoId()));
 
     // Validar proveedor si es INGRESO
     if (tipo == MovimientoStock.TipoMovimiento.INGRESO) {
@@ -51,7 +55,7 @@ public class MovimientoStockServiceImpl {
         throw new RuntimeException("El proveedor es obligatorio para un INGRESO de stock");
       }
       proveedorRepository.findByIdAndEmpresaId(request.getProveedorId(), empresaId)
-          .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con id: " + request.getProveedorId()));
+          .orElseThrow(() -> new ResourceNotFoundException("Proveedor no encontrado con id: " + request.getProveedorId()));
     }
 
     // Validar cantidad
@@ -96,6 +100,7 @@ public class MovimientoStockServiceImpl {
   // -----------------------------------------------
   // LISTAR TODOS DE LA EMPRESA
   // -----------------------------------------------
+  @Override
   public List<MovimientoStockResponse> listar(Long empresaId) {
     return movimientoStockRepository.findByEmpresaIdOrderByFechaDesc(empresaId)
         .stream().map(this::toResponse).collect(Collectors.toList());
@@ -104,6 +109,7 @@ public class MovimientoStockServiceImpl {
   // -----------------------------------------------
   // LISTAR POR PRODUCTO
   // -----------------------------------------------
+  @Override
   public List<MovimientoStockResponse> listarPorProducto(Long productoId, Long empresaId) {
     return movimientoStockRepository.findByProductoIdAndEmpresaIdOrderByFechaDesc(productoId, empresaId)
         .stream().map(this::toResponse).collect(Collectors.toList());
@@ -112,6 +118,7 @@ public class MovimientoStockServiceImpl {
   // -----------------------------------------------
   // LISTAR POR PROVEEDOR
   // -----------------------------------------------
+  @Override
   public List<MovimientoStockResponse> listarPorProveedor(Long proveedorId, Long empresaId) {
     return movimientoStockRepository.findByProveedorIdAndEmpresaIdOrderByFechaDesc(proveedorId, empresaId)
         .stream().map(this::toResponse).collect(Collectors.toList());

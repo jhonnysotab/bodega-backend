@@ -18,4 +18,7 @@ public interface GastoRepository extends JpaRepository<Gasto, Long> {
 
   // Gastos por rango de fecha
   List<Gasto> findByEmpresaIdAndFechaBetweenOrderByFechaDesc(Long empresaId, LocalDate desde, LocalDate hasta);
+
+  // Gastos de un turno de caja (para el arqueo)
+  List<Gasto> findByEmpresaIdAndCajaId(Long empresaId, Long cajaId);
 }

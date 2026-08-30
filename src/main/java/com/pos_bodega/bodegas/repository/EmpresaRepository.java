@@ -1,5 +1,6 @@
-package com.pos_bodega.bodegas.repository.entity;
+package com.pos_bodega.bodegas.repository;
 
+import com.pos_bodega.bodegas.repository.entity.Empresa;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

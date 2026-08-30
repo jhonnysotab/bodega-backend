@@ -1,11 +1,13 @@
 package com.pos_bodega.bodegas.services.impl;
 
+import com.pos_bodega.bodegas.exception.ResourceNotFoundException;
+
 import com.pos_bodega.bodegas.controller.dto.ProductoRequest;
 import com.pos_bodega.bodegas.controller.dto.ProductoResponse;
 import com.pos_bodega.bodegas.repository.entity.Categoria;
-import com.pos_bodega.bodegas.repository.entity.CategoriaRepository;
+import com.pos_bodega.bodegas.repository.CategoriaRepository;
 import com.pos_bodega.bodegas.repository.entity.Producto;
-import com.pos_bodega.bodegas.repository.entity.ProductoRepository;
+import com.pos_bodega.bodegas.repository.ProductoRepository;
 import com.pos_bodega.bodegas.services.ProductoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,7 +45,7 @@ public class ProductoServiceImpl implements ProductoService {
     // Validar que la categoría existe y pertenece a la empresa
     if (request.getCategoriaId() != null) {
       categoriaRepository.findByIdAndEmpresaId(request.getCategoriaId(), empresaId)
-          .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + request.getCategoriaId()));
+          .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada con id: " + request.getCategoriaId()));
     }
 
     Producto producto = new Producto();
@@ -115,7 +117,7 @@ public class ProductoServiceImpl implements ProductoService {
   public ProductoResponse obtenerPorCodigoBarras(String codigoBarras, Long empresaId) {
     Producto producto = productoRepository
         .findByCodigoBarrasAndEmpresaId(codigoBarras, empresaId)
-        .orElseThrow(() -> new RuntimeException("Producto no encontrado con código: " + codigoBarras));
+        .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con código: " + codigoBarras));
     return toResponse(producto);
   }
 
@@ -143,7 +145,7 @@ public class ProductoServiceImpl implements ProductoService {
     // Validar categoría si cambió
     if (request.getCategoriaId() != null) {
       categoriaRepository.findByIdAndEmpresaId(request.getCategoriaId(), empresaId)
-          .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + request.getCategoriaId()));
+          .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada con id: " + request.getCategoriaId()));
     }
 
     mapRequestToEntity(request, producto);
@@ -165,7 +167,7 @@ public class ProductoServiceImpl implements ProductoService {
   // -----------------------------------------------
   private Producto findByIdAndEmpresa(Long id, Long empresaId) {
     return productoRepository.findByIdAndEmpresaId(id, empresaId)
-        .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id));
   }
 
   private void mapRequestToEntity(ProductoRequest request, Producto producto) {

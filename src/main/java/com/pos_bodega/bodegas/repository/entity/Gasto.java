@@ -17,6 +17,15 @@ public class Gasto {
   @Column(name = "empresa_id", nullable = false)
   private Long empresaId;
 
+  @Column(name = "caja_id")
+  private Long cajaId;
+
+  @Column(name = "categoria_id")
+  private Long categoriaId;
+
+  @Column(name = "proveedor_id")
+  private Long proveedorId;
+
   @Column(nullable = false, length = 255)
   private String descripcion;
 
@@ -25,6 +34,9 @@ public class Gasto {
 
   @Column(nullable = false)
   private LocalDate fecha;
+
+  @Column(length = 255)
+  private String nota;
 
   @Column(name = "usuario_id", nullable = false)
   private Long usuarioId;

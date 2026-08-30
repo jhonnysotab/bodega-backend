@@ -1,11 +1,13 @@
 package com.pos_bodega.bodegas.services.impl;
 
+import com.pos_bodega.bodegas.exception.ResourceNotFoundException;
+
 import com.pos_bodega.bodegas.controller.dto.ProveedorRequest;
 import com.pos_bodega.bodegas.controller.dto.ProveedorResponse;
 import com.pos_bodega.bodegas.repository.ProveedorCategoriaRepository;
 import com.pos_bodega.bodegas.repository.ProveedorRepository;
 import com.pos_bodega.bodegas.repository.entity.*;
-import com.pos_bodega.bodegas.repository.entity.CategoriaRepository;
+import com.pos_bodega.bodegas.repository.CategoriaRepository;
 import com.pos_bodega.bodegas.services.ProveedorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,7 @@ public class ProveedorServiceImpl implements ProveedorService {
   @Transactional
   public ProveedorResponse actualizar(Long id, ProveedorRequest request, Long empresaId) {
     Proveedor proveedor = proveedorRepository.findByIdAndEmpresaId(id, empresaId)
-        .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con id: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("Proveedor no encontrado con id: " + id));
 
     proveedor.setNombre(request.getNombre());
     proveedor.setEmpresaProveedor(request.getEmpresaProveedor());
@@ -71,7 +73,7 @@ public class ProveedorServiceImpl implements ProveedorService {
   // ── OBTENER ───────────────────────────────────────────
   public ProveedorResponse obtener(Long id, Long empresaId) {
     Proveedor proveedor = proveedorRepository.findByIdAndEmpresaId(id, empresaId)
-        .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con id: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("Proveedor no encontrado con id: " + id));
     return toResponse(proveedor);
   }
 
@@ -79,7 +81,7 @@ public class ProveedorServiceImpl implements ProveedorService {
   @Transactional
   public ProveedorResponse cambiarEstado(Long id, boolean activo, Long empresaId) {
     Proveedor proveedor = proveedorRepository.findByIdAndEmpresaId(id, empresaId)
-        .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con id: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("Proveedor no encontrado con id: " + id));
     proveedor.setActivo(activo);
     return toResponse(proveedorRepository.save(proveedor));
   }
@@ -93,12 +95,8 @@ public class ProveedorServiceImpl implements ProveedorService {
       categoriaRepository.findByIdAndEmpresaId(catId, empresaId)
           .ifPresent(cat -> {
             ProveedorCategoria pc = new ProveedorCategoria();
-              Proveedor p= new Proveedor();
-              p.setId(proveedor.getId());
-            pc.setProveedor(p);
-            Categoria c = new Categoria();
-              c.setId(cat.getId());
-            pc.setCategoria(c);
+            pc.setProveedor(proveedor);
+            pc.setCategoria(cat);
             proveedorCategoriaRepository.save(pc);
           });
     }

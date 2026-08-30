@@ -9,4 +9,7 @@ public class GastoRequest {
   private String descripcion;
   private BigDecimal monto;
   private LocalDate fecha;
+  private Long categoriaId;
+  private Long proveedorId;
+  private String nota;
 }

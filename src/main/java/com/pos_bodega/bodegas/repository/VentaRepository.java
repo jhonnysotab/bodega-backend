@@ -20,6 +20,9 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
   // Ventas del día
   List<Venta> findByEmpresaIdAndFechaVentaBetween(Long empresaId, LocalDateTime desde, LocalDateTime hasta);
 
+  // Ventas de un turno de caja (para el arqueo)
+  List<Venta> findByEmpresaIdAndCajaId(Long empresaId, Long cajaId);
+
   // Último número de venta para generar el siguiente
   @Query("SELECT v.numeroVenta FROM Venta v WHERE v.empresaId = :empresaId ORDER BY v.id DESC LIMIT 1")
   Optional<String> findUltimoNumeroVenta(@Param("empresaId") Long empresaId);

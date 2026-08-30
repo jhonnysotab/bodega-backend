@@ -34,6 +34,6 @@ public class Usuario {
 
 
   public enum Rol {
-    ADMIN, CAJERO
+    ADMIN, CAJERO, PROGRAMADOR
   }
 }

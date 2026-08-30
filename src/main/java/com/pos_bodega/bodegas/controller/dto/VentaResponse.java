@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class VentaResponse {
   private Long id;
+  private Long cajaId;
   private String numeroVenta;
   private BigDecimal total;
   private String tipoPago;

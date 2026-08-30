@@ -1,7 +1,9 @@
 package com.pos_bodega.bodegas.controller;
 
+import com.pos_bodega.bodegas.controller.dto.ProductoImportadoDTO;
 import com.pos_bodega.bodegas.controller.dto.ProductoRequest;
 import com.pos_bodega.bodegas.controller.dto.ProductoResponse;
+import com.pos_bodega.bodegas.services.FacturaImportService;
 import com.pos_bodega.bodegas.services.ProductoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -10,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,6 +24,7 @@ import java.util.List;
 public class ProductoController {
 
   private final ProductoService productoService;
+  private final FacturaImportService facturaImportService;
 
   private Long getEmpresaId(HttpServletRequest request) {
     return (Long) request.getAttribute("empresaId");
@@ -119,6 +123,20 @@ public class ProductoController {
 
     Long empresaId = getEmpresaId(request);
     return ResponseEntity.ok(productoService.obtenerPorCodigoBarras(codigoBarras, empresaId));
+  }
+
+  // -----------------------------------------------
+  // POST /api/productos/importar-imagen
+  // -----------------------------------------------
+  @Operation(
+      summary = "Importar productos desde una imagen",
+      description = "Analiza una foto de un voucher/factura con IA (Claude) y devuelve los productos reconocidos, "
+          + "para que el usuario los revise/complete antes de guardarlos")
+  @PostMapping(value = "/importar-imagen", consumes = "multipart/form-data")
+  public ResponseEntity<List<ProductoImportadoDTO>> importarImagen(
+      @RequestParam("imagen") MultipartFile imagen) {
+
+    return ResponseEntity.ok(facturaImportService.extraerProductosDeImagen(imagen));
   }
 
   // -----------------------------------------------

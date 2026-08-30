@@ -1,10 +1,12 @@
 package com.pos_bodega.bodegas.services.impl;
 
+import com.pos_bodega.bodegas.exception.ResourceNotFoundException;
+
 import com.pos_bodega.bodegas.controller.dto.CambiarPasswordRequest;
 import com.pos_bodega.bodegas.controller.dto.UsuarioRequest;
 import com.pos_bodega.bodegas.controller.dto.UsuarioResponse;
 import com.pos_bodega.bodegas.repository.entity.Usuario;
-import com.pos_bodega.bodegas.repository.entity.UsuarioRepository;
+import com.pos_bodega.bodegas.repository.UsuarioRepository;
 import com.pos_bodega.bodegas.services.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -146,7 +148,7 @@ public class UsuarioServiceImpl implements UsuarioService {
   // -----------------------------------------------
   private Usuario findByIdAndEmpresa(Long id, Long empresaId) {
     return usuarioRepository.findByIdAndEmpresaId(id, empresaId)
-        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
   }
 
   private UsuarioResponse toResponse(Usuario u) {

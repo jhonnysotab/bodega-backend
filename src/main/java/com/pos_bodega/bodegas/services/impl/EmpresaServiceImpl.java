@@ -1,9 +1,11 @@
 package com.pos_bodega.bodegas.services.impl;
 
+import com.pos_bodega.bodegas.exception.ResourceNotFoundException;
+
 import com.pos_bodega.bodegas.controller.dto.EmpresaRequest;
 import com.pos_bodega.bodegas.controller.dto.EmpresaResponse;
 import com.pos_bodega.bodegas.repository.entity.Empresa;
-import com.pos_bodega.bodegas.repository.entity.EmpresaRepository;
+import com.pos_bodega.bodegas.repository.EmpresaRepository;
 import com.pos_bodega.bodegas.services.EmpresaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -116,7 +118,7 @@ public class EmpresaServiceImpl implements EmpresaService {
   // -----------------------------------------------
   private Empresa findById(Long id) {
     return empresaRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Empresa no encontrada con id: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada con id: " + id));
   }
 
   private void mapRequestToEntity(EmpresaRequest request, Empresa empresa) {

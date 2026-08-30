@@ -18,6 +18,9 @@ public class Venta {
   @Column(name = "empresa_id", nullable = false)
   private Long empresaId;
 
+  @Column(name = "caja_id")
+  private Long cajaId;
+
   @Column(name = "numero_venta", unique = true)
   private String numeroVenta;
 
